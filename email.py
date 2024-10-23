@@ -6,6 +6,23 @@ import json
 import base64
 import shutil
 import re
+from tabulate import tabulate  # Untuk tampilan data dalam bentuk tabel
+from colorama import Fore, Style, init  # Import colorama for coloring output
+
+# Inisialisasi colorama untuk Windows agar warna bekerja
+init(autoreset=True)
+
+def colorize_header(text):
+    """Memberikan warna biru muda pada header"""
+    return f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}{text}{Style.RESET_ALL}"
+
+def colorize_value(text):
+    """Memberikan warna cyan pada nilai"""
+    return f"{Fore.CYAN}{text}{Style.RESET_ALL}"
+
+def colorize_email(text):
+    """Memberikan warna putih tebal pada nama bookmark"""
+    return f"{Fore.WHITE}{Style.BRIGHT}{text}{Style.RESET_ALL}"
 
 def get_chrome_master_key():
     local_state_path = os.path.join(
@@ -47,7 +64,7 @@ def get_chrome_passwords_and_emails():
     for row in cursor.fetchall():
         username = row[1]
         if "@" in username:  # Asumsi username yang mengandung '@' adalah email
-            emails.append(username)
+            emails.append(username)  # Simpan hanya email
 
     cursor.close()
     conn.close()
@@ -83,13 +100,16 @@ def display_emails(preferences_data):
     emails_from_logins = get_chrome_passwords_and_emails()
     emails_from_preferences = get_emails_from_preferences(preferences_data)
 
-    all_emails = set(emails_from_logins + emails_from_preferences)
+    # Mengonversi email dari logins menjadi format yang seragam
+    all_emails = set(emails_from_logins)  # Menyimpan email dari logins
+    all_emails.update(emails_from_preferences)  # Menambahkan email dari preferences
 
     if all_emails:
-        print("\nEmails Found:")
-        print("="*15)
-        for email in all_emails:
-            print(f"Email: {email}")
+        print(colorize_email("\nEmails Found")) 
+        # Menyiapkan data untuk ditampilkan dalam tabel (hanya email, tanpa URL)
+        table_data = [(colorize_value(email)) for email in all_emails]
+        
+        print(tabulate([[email] for email in table_data], headers=[colorize_header("Email")], tablefmt="pretty"))
     else:
         print("Tidak ada email ditemukan.")
 
