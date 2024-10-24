@@ -113,7 +113,7 @@ def display_emails(preferences_data):
     else:
         print("Tidak ada email ditemukan.")
 
-if __name__ == '__main__':
+def show_email():
     preferences_file_path = os.path.join(
         os.environ['USERPROFILE'],
         'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'Default', 'Preferences'
